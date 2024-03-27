@@ -9,7 +9,7 @@ import {
 
 // Provides a safe-wrapper that initialises the OramaClient
 // based on the presence of environmental variables
-const { search, getInitialFacets } = (() => {
+const { search, getInitialFacets, client } = (() => {
   if (ORAMA_CLOUD_ENDPOINT && ORAMA_CLOUD_API_KEY) {
     const orama = new OramaClient({
       endpoint: ORAMA_CLOUD_ENDPOINT,
@@ -17,16 +17,21 @@ const { search, getInitialFacets } = (() => {
     });
 
     return {
+      client: orama,
       search: orama.search.bind(orama),
       getInitialFacets: async () =>
         orama.search({ term: '', ...DEFAULT_ORAMA_QUERY_PARAMS }).catch(),
     };
   }
 
-  return { search: async () => null, getInitialFacets: async () => null };
+  return {
+    search: async () => null,
+    getInitialFacets: async () => null,
+    client: null,
+  };
 })();
 
-export { search, getInitialFacets };
+export { search, getInitialFacets, client };
 
 export const highlighter = new Highlight({
   CSSClass: 'font-bold',
